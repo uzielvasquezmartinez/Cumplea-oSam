@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian: #0A0A0D;
+  --color-onyx: #141419;
+  --color-pearl: #FAFAFC;
+  --color-ash: #A1A0AB;
+  --color-pink-bloom: #FADADD;
+  --color-pink-dust: #E2A9B2;
+  --color-pink-deep: #C98A95;
+  --color-sage-dark: #3A443E;
+  --color-champagne-light: #FDF0D5;
+  --color-champagne-gold: #F5D79E;
+  --color-champagne-warm: #E6C587;
+
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #0A0A0D;
+  color: #FAFAFC;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-serif { font-family: "Cormorant Garamond", Georgia, serif !important; }
+.font-sans { font-family: "Plus Jakarta Sans", system-ui, sans-serif !important; }
+.font-mono { font-family: "Space Mono", monospace !important; }
+
+.hydrangea-glow {
+  filter: drop-shadow(0 0 18px rgba(250, 218, 221, 0.24));
+  will-change: transform, opacity;
+}
+
+.shadow-pink-glow {
+  box-shadow: 0 0 28px -5px rgba(250, 218, 221, 0.22);
+}
+
+.shadow-pink-glow-lg {
+  box-shadow: 0 0 45px -4px rgba(250, 218, 221, 0.34);
+}
+
+.shadow-champagne-glow {
+  box-shadow: 0 0 28px -4px rgba(245, 215, 158, 0.25);
+}
+
+.champagne-sparkle {
+  filter: drop-shadow(0 0 10px rgba(245, 215, 158, 0.4));
+}
