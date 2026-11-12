@@ -1,703 +1,510 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Sparkles,
-  RotateCcw,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  ArrowLeft,
-  Eye,
-} from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import HydrangeaCluster from '../botanical/HydrangeaCluster';
 
-const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-
 export default function DivergentGarden({ gardenData, onBack }) {
-  const allCards = useMemo(() => {
-    let counter = 0;
-    const deck = [];
-    gardenData?.letters?.forEach((group) => {
-      group?.quotes?.forEach((quoteText) => {
-        deck.push({
-          id: `${group.id}-${counter}`,
-          index: counter,
-          roman: ROMAN_NUMERALS[counter] || `${counter + 1}`,
-          groupId: group.id,
-          categoryTitle: group.title,
-          factionTag: group.factionTag,
-          whenToRead: group.whenToRead,
-          quote: quoteText,
-        });
-        counter++;
-      });
-    });
-    return deck;
-  }, [gardenData]);
-
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [readCardIds, setReadCardIds] = useState([]);
+  const cards = useMemo(() => gardenData?.cards || [], [gardenData]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [flippedCardId, setFlippedCardId] = useState(null);
 
-  const filteredCards = useMemo(() => {
-    if (selectedCategory === 'all') return allCards;
-    return allCards.filter((c) => c.groupId === selectedCategory);
-  }, [allCards, selectedCategory]);
+  const activeCard = cards[activeIndex] || cards[0];
 
-  const handleCategoryChange = (catId) => {
-    setSelectedCategory(catId);
-    setActiveIndex(0);
-    setFlippedCardId(null);
+  // Generar la cola circular lineal con las otras cartas (empezando por la siguiente a la activa)
+  const queueCards = useMemo(() => {
+    if (!cards.length) return [];
+    const result = [];
+    for (let i = 1; i < cards.length; i++) {
+      const idx = (activeIndex + i) % cards.length;
+      result.push({ ...cards[idx], originalIndex: idx });
+    }
+    return result;
+  }, [cards, activeIndex]);
+
+  const handleSelectCard = (index) => {
+    setActiveIndex(index);
   };
 
-  const currentCard = filteredCards[activeIndex] || filteredCards[0];
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % cards.length);
+  };
 
-  const handleNext = useCallback(() => {
-    setFlippedCardId(null);
-    setActiveIndex((prev) => (prev + 1) % filteredCards.length);
-  }, [filteredCards.length]);
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length);
+  };
 
-  const handlePrev = useCallback(() => {
-    setFlippedCardId(null);
-    setActiveIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length);
-  }, [filteredCards.length]);
-
-  // Keyboard navigation
+  // Navegación por teclado opcional y accesible (flechas izquierda/derecha)
   useEffect(() => {
-    const onKeyDown = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleNext, handlePrev]);
-
-  const toggleFlip = (card) => {
-    if (flippedCardId === card.id) {
-      setFlippedCardId(null);
-    } else {
-      setFlippedCardId(card.id);
-      if (!readCardIds.includes(card.id)) {
-        setReadCardIds((prev) => [...prev, card.id]);
-      }
-    }
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cards.length]);
 
   const words = useMemo(() => {
-    return currentCard ? currentCard.quote.split(' ') : [];
-  }, [currentCard]);
+    return activeCard?.quote ? activeCard.quote.split(' ') : [];
+  }, [activeCard]);
+
+  if (!activeCard) return null;
 
   return (
     <section
       style={{
         position: 'relative',
         minHeight: '100vh',
-        padding: '36px 20px 80px 20px',
-        backgroundColor: '#0A0A0D',
+        width: '100%',
+        backgroundColor: '#07070A',
         overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        borderTop: '1px solid rgba(250, 218, 221, 0.22)',
       }}
     >
-      {/* Background ambient cluster */}
-      <div style={{ position: 'absolute', top: '10px', right: '-60px', opacity: 0.35, pointerEvents: 'none' }}>
-        <HydrangeaCluster baseDelay={0.1} size={260} />
+      {/* 1. ESCENARIO DE FONDO: LA CARTA SELECCIONADA SE ABRE COMPLETAMENTE */}
+      <AnimatePresence mode="popLayout">
+        <motion.div
+          key={activeCard.id}
+          layoutId={`card-container-${activeCard.id}`}
+          initial={{ opacity: 0.4, scale: 1.06 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            background: `radial-gradient(circle at 25% 40%, ${activeCard.accent} 0%, rgba(10, 10, 14, 0.94) 58%, #07070A 100%)`,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Número Romano Monumental de Marca de Agua en el Fondo */}
+          <motion.span
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 0.06, x: 0 }}
+            transition={{ duration: 0.9 }}
+            className="font-serif select-none"
+            style={{
+              position: 'absolute',
+              top: '6%',
+              left: '4%',
+              fontSize: 'clamp(10rem, 26vw, 22rem)',
+              fontWeight: 700,
+              color: '#FADADD',
+              lineHeight: 0.85,
+              pointerEvents: 'none',
+            }}
+          >
+            {activeCard.roman}
+          </motion.span>
+
+          {/* Hortensias Botánicas del Escenario Expandido */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '-30px',
+              opacity: 0.55,
+              pointerEvents: 'none',
+            }}
+          >
+            <HydrangeaCluster baseDelay={0.1} interactive={false} size={280} />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '18%',
+              left: '-60px',
+              opacity: 0.3,
+              pointerEvents: 'none',
+            }}
+          >
+            <HydrangeaCluster baseDelay={0.25} interactive={false} size={220} />
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* 2. BARRA SUPERIOR CON BOTÓN REGRESAR */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 20,
+          width: '100%',
+          padding: '24px clamp(20px, 5vw, 56px) 0 clamp(20px, 5vw, 56px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}
+      >
+        {onBack && (
+          <motion.button
+            onClick={onBack}
+            whileHover={{ scale: 1.05, x: -3 }}
+            whileTap={{ scale: 0.95 }}
+            className="font-mono shadow-pink-glow"
+            style={{
+              padding: '8px 18px',
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(20, 20, 25, 0.85)',
+              border: '1px solid rgba(250, 218, 221, 0.3)',
+              color: '#FADADD',
+              fontSize: '11px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              letterSpacing: '0.1em',
+            }}
+          >
+            <ArrowLeft style={{ width: '13px', height: '13px' }} />
+            Regresar al inicio
+          </motion.button>
+        )}
       </div>
 
-      <div style={{ maxWidth: '1180px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-        {/* Top bar with back button & edition tag (No traditional navbar) */}
+      {/* 3. CONTENIDO PRINCIPAL: INFORMACIÓN ABIERTA (IZQUIERDA) + CARRUSEL LINEAL (DERECHA/ABAJO) */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          padding: 'clamp(24px, 5vw, 56px)',
+          gap: '36px',
+        }}
+      >
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '32px',
-            paddingBottom: '20px',
-            borderBottom: '1px solid rgba(250, 218, 221, 0.12)',
-          }}
-        >
-          {onBack && (
-            <motion.button
-              onClick={onBack}
-              whileHover={{ scale: 1.05, x: -3 }}
-              whileTap={{ scale: 0.95 }}
-              className="font-mono shadow-pink-glow"
-              style={{
-                padding: '8px 18px',
-                borderRadius: '9999px',
-                backgroundColor: 'rgba(20, 20, 25, 0.85)',
-                border: '1px solid rgba(250, 218, 221, 0.3)',
-                color: '#FADADD',
-                fontSize: '11px',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                letterSpacing: '0.1em',
-              }}
-            >
-              <ArrowLeft style={{ width: '13px', height: '13px' }} />
-              Regresar al inicio
-            </motion.button>
-          )}
-
-          <div
-            style={{
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              backgroundColor: 'rgba(20, 20, 25, 0.65)',
-              border: '1px solid rgba(250, 218, 221, 0.22)',
-            }}
-          >
-            <span className="font-mono" style={{ fontSize: '11px', letterSpacing: '0.18em', color: '#FADADD' }}>
-              {gardenData?.headerTag}
-            </span>
-          </div>
-        </div>
-
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2
-            className="font-serif"
-            style={{
-              fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
-              fontWeight: 700,
-              color: '#FAFAFC',
-              margin: '0 0 12px 0',
-              lineHeight: 1.15,
-            }}
-          >
-            {gardenData?.title}
-          </h2>
-
-          <p
-            className="font-serif italic"
-            style={{
-              color: '#A1A0AB',
-              fontSize: '1.2rem',
-              maxWidth: '640px',
-              margin: '0 auto 24px auto',
-              lineHeight: 1.6,
-            }}
-          >
-            {gardenData?.subtitle}
-          </p>
-
-          {/* Category Filter Pills */}
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-            }}
-          >
-            <button
-              onClick={() => handleCategoryChange('all')}
-              className="font-mono"
-              style={{
-                padding: '7px 16px',
-                borderRadius: '9999px',
-                fontSize: '11px',
-                cursor: 'pointer',
-                backgroundColor: selectedCategory === 'all' ? '#FADADD' : '#141419',
-                color: selectedCategory === 'all' ? '#0A0A0D' : '#FAFAFC',
-                border: '1px solid rgba(250, 218, 221, 0.3)',
-                fontWeight: selectedCategory === 'all' ? 700 : 400,
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Todas ({allCards.length})
-            </button>
-
-            {gardenData?.letters?.map((group) => (
-              <button
-                key={group.id}
-                onClick={() => handleCategoryChange(group.id)}
-                className="font-mono"
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: '9999px',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                  backgroundColor: selectedCategory === group.id ? '#FADADD' : '#141419',
-                  color: selectedCategory === group.id ? '#0A0A0D' : '#FAFAFC',
-                  border: '1px solid rgba(250, 218, 221, 0.3)',
-                  fontWeight: selectedCategory === group.id ? 700 : 400,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {group.title}
-              </button>
-            ))}
-
-            <span
-              className="font-mono"
-              style={{
-                padding: '7px 14px',
-                borderRadius: '9999px',
-                fontSize: '11px',
-                backgroundColor: 'rgba(20,20,25,0.6)',
-                color: '#FADADD',
-                border: '1px dashed rgba(250,218,221,0.3)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <Eye style={{ width: '13px', height: '13px' }} />
-              Leídas: {readCardIds.length} / {allCards.length}
-            </span>
-          </div>
-        </div>
-
-        {/* 3D LINEAR CAROUSEL STAGE */}
-        <div
-          style={{
-            position: 'relative',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+            alignItems: 'end',
+            gap: '40px',
             width: '100%',
-            height: '560px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            perspective: '1400px',
-            perspectiveOrigin: '50% 50%',
-            margin: '20px 0 30px 0',
-            userSelect: 'none',
+            maxWidth: '1380px',
+            margin: '0 auto',
           }}
         >
-          {/* Navigation Arrows */}
-          <button
-            onClick={handlePrev}
-            aria-label="Carta anterior"
-            className="shadow-pink-glow"
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 40,
-              width: '46px',
-              height: '46px',
-              borderRadius: '9999px',
-              backgroundColor: 'rgba(20, 20, 25, 0.85)',
-              border: '1px solid rgba(250, 218, 221, 0.4)',
-              color: '#FADADD',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <ChevronLeft style={{ width: '22px', height: '22px' }} />
-          </button>
-
-          <button
-            onClick={handleNext}
-            aria-label="Siguiente carta"
-            className="shadow-pink-glow"
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 40,
-              width: '46px',
-              height: '46px',
-              borderRadius: '9999px',
-              backgroundColor: 'rgba(20, 20, 25, 0.85)',
-              border: '1px solid rgba(250, 218, 221, 0.4)',
-              color: '#FADADD',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            <ChevronRight style={{ width: '22px', height: '22px' }} />
-          </button>
-
-          {/* Cards Track */}
+          {/* PANEL IZQUIERDO: INFORMACIÓN COMPLETA Y FRASE DE LA CARTA ABIERTA */}
           <div
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transformStyle: 'preserve-3d',
-            }}
+            onMouseEnter={() => setIsAutoPlaying(false)}
+            onMouseLeave={() => setIsAutoPlaying(true)}
+            style={{ maxWidth: '640px' }}
           >
-            {filteredCards.map((card, idx) => {
-              const offset = idx - activeIndex;
-              const isCenter = offset === 0;
-              const isFlipped = flippedCardId === card.id;
-              const isRead = readCardIds.includes(card.id);
-
-              // Don't render cards far away to keep 60 FPS
-              if (Math.abs(offset) > 2) return null;
-
-              // Calculate 3D transforms
-              const xOffset = offset * 280;
-              const scale = isCenter ? 1 : Math.max(0.72, 1 - Math.abs(offset) * 0.18);
-              const zTranslate = Math.abs(offset) * -120;
-              const baseRotateY = offset < 0 ? 30 : offset > 0 ? -30 : 0;
-              const currentRotateY = isCenter && isFlipped ? 180 : baseRotateY;
-              const opacity = isCenter ? 1 : Math.max(0.35, 1 - Math.abs(offset) * 0.42);
-              const zIndex = 30 - Math.abs(offset) * 5;
-
-              return (
-                <motion.div
-                  key={card.id}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`info-${activeCard.id}`}
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.55, ease: 'easeOut' }}
+              >
+                {/* Etiqueta de Facción y Número de Carta */}
+                <div
                   style={{
-                    position: 'absolute',
-                    width: 'min(380px, 86vw)',
-                    height: '490px',
-                    transformStyle: 'preserve-3d',
-                    cursor: isCenter ? 'pointer' : 'pointer',
-                    zIndex,
-                  }}
-                  animate={{
-                    x: xOffset,
-                    scale,
-                    rotateY: currentRotateY,
-                    z: zTranslate,
-                    opacity,
-                  }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 160,
-                    damping: 22,
-                    mass: 0.9,
-                  }}
-                  onClick={() => {
-                    if (isCenter) {
-                      toggleFlip(card);
-                    } else {
-                      setFlippedCardId(null);
-                      setActiveIndex(idx);
-                    }
-                  }}
-                  drag={isCenter ? 'x' : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  onDragEnd={(e, { offset: dragOffset, velocity }) => {
-                    if (dragOffset.x > 70 || velocity.x > 300) {
-                      handlePrev();
-                    } else if (dragOffset.x < -70 || velocity.x < -300) {
-                      handleNext();
-                    }
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginBottom: '14px',
+                    padding: '5px 14px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(20, 20, 25, 0.85)',
+                    border: '1px solid rgba(250, 218, 221, 0.35)',
                   }}
                 >
-                  {/* FRONT FACE */}
-                  <div
-                    className={isCenter ? 'shadow-pink-glow-lg' : 'shadow-pink-glow'}
+                  <span className="font-mono" style={{ fontSize: '11px', color: '#FADADD', fontWeight: 700 }}>
+                    CARTA {activeCard.roman} / XV
+                  </span>
+                  <span style={{ color: 'rgba(250,218,221,0.3)' }}>|</span>
+                  <span className="font-mono" style={{ fontSize: '11px', color: '#FAFAFC', letterSpacing: '0.12em' }}>
+                    {activeCard.faction}
+                  </span>
+                </div>
+
+                {/* Título */}
+                <h2
+                  className="font-serif"
+                  style={{
+                    fontSize: 'clamp(2.4rem, 5vw, 4.2rem)',
+                    fontWeight: 700,
+                    color: '#FAFAFC',
+                    lineHeight: 1.05,
+                    margin: '0 0 8px 0',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.02em',
+                    textShadow: '0 0 35px rgba(250, 218, 221, 0.25)',
+                  }}
+                >
+                  {activeCard.title}
+                </h2>
+
+                <p
+                  className="font-mono"
+                  style={{
+                    fontSize: '12px',
+                    color: '#FADADD',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    margin: '0 0 24px 0',
+                  }}
+                >
+                  {activeCard.subtitle}
+                </p>
+
+                {/* Contenedor de la Frase Completa con Revelado Palabra por Palabra */}
+                <div
+                  className="shadow-pink-glow"
+                  style={{
+                    backgroundColor: 'rgba(16, 16, 22, 0.82)',
+                    backdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(250, 218, 221, 0.28)',
+                    borderRadius: '20px',
+                    padding: 'clamp(20px, 3.5vw, 30px)',
+                  }}
+                >
+                  <p
+                    className="font-serif italic"
                     style={{
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '26px',
-                      backgroundColor: '#121217',
-                      border: isCenter
-                        ? '1.8px solid rgba(250, 218, 221, 0.7)'
-                        : '1px solid rgba(250, 218, 221, 0.25)',
-                      padding: '28px 24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      overflow: 'hidden',
-                      backfaceVisibility: 'hidden',
-                      transform: 'rotateY(0deg)',
+                      fontSize: 'clamp(1.25rem, 2.3vw, 1.6rem)',
+                      lineHeight: 1.65,
+                      color: '#FAFAFC',
+                      margin: 0,
                     }}
                   >
-                    {/* Top card info */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span className="font-mono" style={{ fontSize: '11px', letterSpacing: '0.18em', color: '#FADADD' }}>
-                        CARTA {card.roman}
-                      </span>
-
-                      {isRead ? (
-                        <span
-                          className="font-mono"
-                          style={{
-                            fontSize: '10px',
-                            color: '#0A0A0D',
-                            backgroundColor: '#FADADD',
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                          }}
-                        >
-                          <CheckCircle2 style={{ width: '11px', height: '11px' }} /> LEÍDA
-                        </span>
-                      ) : (
-                        <span
-                          className="font-mono"
-                          style={{
-                            fontSize: '10px',
-                            color: '#A1A0AB',
-                            border: '1px solid rgba(250,218,221,0.25)',
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                          }}
-                        >
-                          OCULTA
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Floral Emblem Center */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                        padding: '10px 0',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '90px',
-                          height: '90px',
-                          borderRadius: '9999px',
-                          backgroundColor: 'rgba(10, 10, 13, 0.85)',
-                          border: '1.5px solid rgba(250, 218, 221, 0.45)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 0 35px rgba(250, 218, 221, 0.25)',
-                          marginBottom: '20px',
-                        }}
+                    <span style={{ color: '#FADADD', fontSize: '1.6rem', marginRight: '4px' }}>"</span>
+                    {words.map((word, idx) => (
+                      <motion.span
+                        key={idx}
+                        initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.35, delay: 0.15 + idx * 0.032 }}
+                        style={{ display: 'inline-block', marginRight: '6px' }}
                       >
-                        <svg viewBox="-35 -35 70 70" style={{ width: '56px', height: '56px' }}>
-                          <path d="M 0,-3 C -13,-14 -15,-28 0,-30 C 15,-28 13,-14 0,-3 Z" fill="#FADADD" />
-                          <path d="M 0,3 C -13,14 -15,28 0,30 C 15,28 13,14 0,3 Z" fill="#E2A9B2" />
-                          <path d="M -3,0 C -14,-13 -28,-15 -30,0 C -28,15 -14,13 -3,0 Z" fill="#FCEEF2" />
-                          <path d="M 3,0 C 14,-13 28,-15 30,0 C 28,15 14,13 3,0 Z" fill="#FADADD" />
-                          <circle cx="0" cy="0" r="4.5" fill="#0A0A0D" />
-                          <circle cx="0" cy="0" r="1.8" fill="#FDF0D5" />
-                          <circle cx="0" cy="0" r="0.9" fill="#F5D79E" />
-                        </svg>
-                      </div>
+                        {word}
+                      </motion.span>
+                    ))}
+                    <span style={{ color: '#FADADD', fontSize: '1.6rem', marginLeft: '2px' }}>"</span>
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-                      <span className="font-serif" style={{ fontSize: '1.75rem', color: '#FAFAFC', fontWeight: 600 }}>
-                        {card.categoryTitle}
-                      </span>
-                      <span className="font-mono" style={{ fontSize: '10px', color: '#FADADD', letterSpacing: '0.14em', marginTop: '6px' }}>
-                        {card.factionTag}
-                      </span>
-                      <span className="font-serif italic" style={{ fontSize: '0.95rem', color: '#A1A0AB', marginTop: '10px' }}>
-                        {card.whenToRead}
-                      </span>
-                    </div>
+          {/* PANEL DERECHO: CARRUSEL LINEAL ANIMADO DE LAS SIGUIENTES CARTAS */}
+          <div style={{ width: '100%', overflow: 'hidden' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px',
+              }}
+            >
+              <span className="font-mono" style={{ fontSize: '11px', color: '#A1A0AB', letterSpacing: '0.14em' }}>
+                SELECCIONA O DESLIZA UNA CARTA PARA ABRIRLA →
+              </span>
+            </div>
 
-                    {/* Bottom CTA */}
-                    <div style={{ textAlign: 'center' }}>
-                      <span
-                        className="font-mono"
-                        style={{
-                          fontSize: '11px',
-                          color: '#FAFAFC',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          backgroundColor: 'rgba(250, 218, 221, 0.08)',
-                          padding: '6px 14px',
-                          borderRadius: '9999px',
-                          border: '1px solid rgba(250, 218, 221, 0.25)',
-                        }}
-                      >
-                        <Sparkles style={{ width: '13px', height: '13px' }} color="#F5D79E" />
-                        {isCenter ? 'Toca para voltear en 3D' : 'Toca para centrar'}
-                      </span>
-                    </div>
+            {/* Pista Horizontal Deslizable con las Cartas en Espera */}
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: -1100, right: 0 }}
+              style={{
+                display: 'flex',
+                gap: '16px',
+                cursor: 'grab',
+                paddingBottom: '12px',
+              }}
+            >
+              {queueCards.map((card, idx) => (
+                <motion.div
+                  key={card.id}
+                  layoutId={`card-container-${card.id}`}
+                  onClick={() => handleSelectCard(card.originalIndex)}
+                  whileHover={{ y: -10, scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                  className="shadow-pink-glow"
+                  style={{
+                    flexShrink: 0,
+                    width: '185px',
+                    height: '265px',
+                    borderRadius: '18px',
+                    backgroundColor: '#141419',
+                    backgroundImage: `radial-gradient(circle at 80% 20%, ${card.accent} 0%, #121217 75%)`,
+                    border: idx === 0
+                      ? '1.5px solid #FADADD'
+                      : '1px solid rgba(250, 218, 221, 0.25)',
+                    padding: '18px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* Mini Hortensia Decorativa en la Tarjeta de la Cola */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '-32px',
+                      right: '-32px',
+                      opacity: 0.45,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <HydrangeaCluster interactive={false} size={105} />
                   </div>
 
-                  {/* BACK FACE (REVEALED 180 DEGREE) */}
-                  <div
-                    className="shadow-pink-glow-lg"
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '26px',
-                      backgroundColor: '#121217',
-                      border: '1.8px solid #FADADD',
-                      backfaceVisibility: 'hidden',
-                      transform: 'rotateY(180deg)',
-                      padding: '28px 24px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {/* Corner Hydrangeas */}
-                    <div style={{ position: 'absolute', top: '-45px', right: '-45px', opacity: 0.5, pointerEvents: 'none' }}>
-                      <HydrangeaCluster baseDelay={0.2} interactive={false} size={150} />
-                    </div>
-                    <div style={{ position: 'absolute', bottom: '-45px', left: '-45px', opacity: 0.35, pointerEvents: 'none' }}>
-                      <HydrangeaCluster baseDelay={0.3} interactive={false} size={140} />
-                    </div>
-
-                    {/* Back header */}
-                    <div style={{ position: 'relative', zIndex: 5, borderBottom: '1px solid rgba(250, 218, 221, 0.2)', paddingBottom: '12px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span className="font-mono" style={{ fontSize: '11px', color: '#FADADD', letterSpacing: '0.18em' }}>
-                          CARTA ELEGIDA // {card.roman}
-                        </span>
-                        <Sparkles style={{ width: '15px', height: '15px' }} color="#F5D79E" />
-                      </div>
-                      <h4 className="font-serif" style={{ fontSize: '1.35rem', color: '#FAFAFC', margin: '4px 0 0 0' }}>
-                        {card.categoryTitle}
-                      </h4>
-                    </div>
-
-                    {/* Word-by-word quote */}
-                    <div style={{ position: 'relative', zIndex: 5, margin: 'auto 0', padding: '16px 4px', textAlign: 'center' }}>
-                      <p
-                        className="font-serif italic"
-                        style={{
-                          fontSize: 'clamp(1.15rem, 2.8vw, 1.35rem)',
-                          lineHeight: 1.65,
-                          color: '#FAFAFC',
-                          margin: 0,
-                        }}
-                      >
-                        <span style={{ color: '#FADADD', fontSize: '1.6rem', marginRight: '4px' }}>“</span>
-                        {isFlipped &&
-                          words.map((word, i) => (
-                            <motion.span
-                              key={i}
-                              initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
-                              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                              transition={{ duration: 0.35, delay: 0.2 + i * 0.038 }}
-                              style={{ display: 'inline-block', marginRight: '5px' }}
-                            >
-                              {word}
-                            </motion.span>
-                          ))}
-                        <span style={{ color: '#FADADD', fontSize: '1.6rem', marginLeft: '2px' }}>”</span>
-                      </p>
-                    </div>
-
-                    {/* Back Footer Actions */}
-                    <div
+                  {/* Número Romano de la Mini-Carta */}
+                  <div style={{ position: 'relative', zIndex: 2 }}>
+                    <span
+                      className="font-mono"
                       style={{
-                        position: 'relative',
-                        zIndex: 5,
-                        borderTop: '1px solid rgba(250, 218, 221, 0.18)',
-                        paddingTop: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '10px',
+                        fontSize: '10px',
+                        color: '#FADADD',
+                        letterSpacing: '0.15em',
+                        display: 'block',
                       }}
                     >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFlip(card);
-                        }}
-                        className="font-mono"
-                        style={{
-                          padding: '8px 14px',
-                          borderRadius: '10px',
-                          backgroundColor: 'rgba(10, 10, 13, 0.85)',
-                          border: '1px solid rgba(250, 218, 221, 0.3)',
-                          color: '#FADADD',
-                          fontSize: '11px',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                        }}
-                      >
-                        <RotateCcw style={{ width: '12px', height: '12px' }} /> Voltear
-                      </button>
+                      CARTA {card.roman}
+                    </span>
+                    <span
+                      className="font-serif"
+                      style={{
+                        fontSize: '2.2rem',
+                        fontWeight: 700,
+                        color: 'rgba(250, 250, 252, 0.22)',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {card.roman}
+                    </span>
+                  </div>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNext();
-                        }}
-                        className="font-mono"
-                        style={{
-                          flex: 1,
-                          padding: '9px 14px',
-                          borderRadius: '10px',
-                          backgroundColor: '#FADADD',
-                          border: 'none',
-                          color: '#0A0A0D',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          letterSpacing: '0.08em',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        SIGUIENTE CARTA →
-                      </button>
-                    </div>
+                  {/* Título e Identificador en la parte inferior de la Mini-Carta */}
+                  <div style={{ position: 'relative', zIndex: 2 }}>
+                    <span
+                      className="font-mono"
+                      style={{
+                        fontSize: '9px',
+                        color: '#FADADD',
+                        letterSpacing: '0.1em',
+                        display: 'block',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {card.faction}
+                    </span>
+                    <h4
+                      className="font-serif"
+                      style={{
+                        fontSize: '1.2rem',
+                        color: '#FAFAFC',
+                        margin: 0,
+                        lineHeight: 1.2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {card.title}
+                    </h4>
                   </div>
                 </motion.div>
-              );
-            })}
-          </div>
-        </div>
+              ))}
+            </motion.div>
 
-        {/* Carousel Pagination Indicator (Roman Numerals) */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            flexWrap: 'wrap',
-            margin: '10px 0 40px 0',
-          }}
-        >
-          {filteredCards.map((card, idx) => {
-            const isCurrent = idx === activeIndex;
-            const isRead = readCardIds.includes(card.id);
+            {/* Barra Inferior de Controles + Línea de Tiempo + Contador */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                marginTop: '18px',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={handlePrev}
+                  aria-label="Carta anterior"
+                  style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(20, 20, 25, 0.9)',
+                    border: '1px solid rgba(250, 218, 221, 0.35)',
+                    color: '#FAFAFC',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ChevronLeft style={{ width: '18px', height: '18px' }} />
+                </button>
+                <button
+                  onClick={handleNext}
+                  aria-label="Siguiente carta"
+                  style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(20, 20, 25, 0.9)',
+                    border: '1px solid rgba(250, 218, 221, 0.35)',
+                    color: '#FAFAFC',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ChevronRight style={{ width: '18px', height: '18px' }} />
+                </button>
+              </div>
 
-            return (
-              <button
-                key={card.id}
-                onClick={() => {
-                  setFlippedCardId(null);
-                  setActiveIndex(idx);
-                }}
-                className="font-mono"
+              {/* Barra de Progreso Discreta por Posición (Sin temporizador) */}
+              <div
                 style={{
-                  width: '34px',
-                  height: '34px',
+                  flex: 1,
+                  height: '3px',
+                  backgroundColor: 'rgba(250, 218, 221, 0.14)',
                   borderRadius: '9999px',
-                  backgroundColor: isCurrent ? '#FADADD' : 'rgba(20, 20, 25, 0.8)',
-                  color: isCurrent ? '#0A0A0D' : isRead ? '#FADADD' : '#A1A0AB',
-                  border: isCurrent
-                    ? '2px solid #FDF0D5'
-                    : isRead
-                    ? '1px solid rgba(250, 218, 221, 0.45)'
-                    : '1px solid rgba(250, 218, 221, 0.15)',
-                  fontSize: '11px',
-                  fontWeight: isCurrent ? 700 : 500,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.25s ease',
-                  boxShadow: isCurrent ? '0 0 18px rgba(245, 215, 158, 0.45)' : 'none',
+                  overflow: 'hidden',
+                  position: 'relative',
                 }}
               >
-                {card.roman}
-              </button>
-            );
-          })}
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${((activeIndex + 1) / cards.length) * 100}%`,
+                    backgroundColor: '#FADADD',
+                    borderRadius: '9999px',
+                    boxShadow: '0 0 8px rgba(250, 218, 221, 0.35)',
+                    transition: 'width 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                />
+              </div>
+
+              {/* Numeración Grande Derecha (01 / 15) */}
+              <span
+                className="font-serif"
+                style={{
+                  fontSize: '1.75rem',
+                  fontWeight: 700,
+                  color: '#FADADD',
+                  minWidth: '64px',
+                  textAlign: 'right',
+                }}
+              >
+                {String(activeIndex + 1).padStart(2, '0')}
+                <span style={{ fontSize: '1rem', color: '#A1A0AB', fontWeight: 400 }}>
+                  /{cards.length}
+                </span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
