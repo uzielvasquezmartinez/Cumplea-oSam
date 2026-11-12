@@ -34,9 +34,13 @@ export default function DivergentGarden({ gardenData, onBack }) {
 
   // Navegación por teclado opcional y accesible (flechas izquierda/derecha)
   useEffect(() => {
+    if (!cards.length) return;
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') handleNext();
-      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') {
+        setActiveIndex((prev) => (prev + 1) % cards.length);
+      } else if (e.key === 'ArrowLeft') {
+        setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
