@@ -19,150 +19,178 @@ export const birthdayContent = {
 
   secretTrigger: {
     promptText: "Espera... alguien dejó una nota fuera del archivo oficial.",
-    buttonText: "Oye...",
-    stickerUrl: "/assets/sticker-oye.webp",
-    stickerCaption: "Oye... hay un rincón oculto en esta página que no pertenece a ninguna facción. Escribe la clave para entrar.",
-    inputPlaceholder: "Escribe la contraseña...",
-    acceptedPasswords: ["divirgente", "divergente"],
-    hintText: "Pista: Tu libro favorito (aquel donde elegir ser tú misma y no encajar en un solo molde lo cambia todo).",
+    buttonText: "Entrar al rincón secreto",
+    stickerUrl: "/assets/perrito.jpg",
+    stickerCaption: "Hay un rincón oculto en esta página que no pertenece a ninguna facción.",
+    inputPlaceholder: "Escribe la palabra secreta...",
+    acceptedPasswords: ["oye", "Oye", "OYE"],
+    hintText: "Pista: El perrito tiene la respuesta.",
   },
 
   secretGarden: {
+    headerTag: "ARCHIVO SECRETO // 18 CARTAS PARA TUS 21",
     cards: [
       {
         id: "card-1",
         roman: "I",
-        faction: "IDENTIDAD // XXI",
-        title: "Tu Propia Facción",
-        subtitle: "La Ceremonia de Elección",
+        faction: "CAPÍTULO I // IDENTIDAD",
+        title: "Tu Propia Medida",
+        subtitle: "Sin etiquetas",
         accent: "rgba(250, 218, 221, 0.22)",
-        quote: "Hoy no celebras solo un año más. Celebras que sigues eligiendo ser tú, aunque el mundo te pida que encajes en una sola facción."
+        quote: "Hoy no celebras solo un año más; celebras que sigues eligiendo ser tú, incluso cuando el mundo insiste en etiquetarte dentro de una sola caja."
       },
       {
         id: "card-2",
         roman: "II",
-        faction: "DIVERGENTE // ESENCIA",
-        title: "Fuera del Molde",
-        subtitle: "Única en tu especie",
+        faction: "CAPÍTULO II // TIEMPO PROPIO",
+        title: "La Flor de tus Veintiuno",
+        subtitle: "A tu propio ritmo",
         accent: "rgba(226, 169, 178, 0.24)",
-        quote: "Feliz cumpleaños a la persona más Divergente que conozco: la que no cabe en una sola caja."
+        quote: "Dicen que cada persona guarda en su interior una flor única que marca el ritmo de su propio tiempo. Que estos 21 años florezcan a tu manera, sin pedirle permiso al reloj de nadie."
       },
       {
         id: "card-3",
         roman: "III",
-        faction: "ELECCIÓN // 21 AÑOS",
-        title: "Tu Propio Camino",
-        subtitle: "Veintiún años de certeza",
+        faction: "CAPÍTULO III // ESENCIA",
+        title: "Fuera de Catálogo",
+        subtitle: "Imposible de clasificar",
         accent: "rgba(250, 218, 221, 0.18)",
-        quote: "Veintiún años y una sola certeza: si hoy tuvieras que pasar por la Ceremonia de Elección, volverías a elegir tu propio camino."
+        quote: "Feliz cumpleaños a alguien imposible de clasificar: demasiado valiente para rendirse, demasiado noble para volverse fría y demasiado libre para vivir en automático."
       },
       {
         id: "card-4",
         roman: "IV",
-        faction: "OSADÍA // CORAJE",
-        title: "Actuar a Pesar del Miedo",
-        subtitle: "Fuerza silenciosa",
+        faction: "CAPÍTULO IV // UNIVERSIDAD",
+        title: "Más Despacio",
+        subtitle: "Pasos firmes",
         accent: "rgba(201, 138, 149, 0.25)",
-        quote: "Tris no dejó de tener miedo, aprendió a actuar a pesar del miedo. Tú estás haciendo lo mismo, aunque no lo veas."
+        quote: "Cuando sientas que la universidad te exige correr sin aliento, recuerda la lección de los pasos lentos: no gana quien llega más rápido, sino quien no pierde el rumbo en el camino."
       },
       {
         id: "card-5",
         roman: "V",
-        faction: "OSADÍA // VALENTÍA",
-        title: "La Prueba de tu Valor",
+        faction: "CAPÍTULO V // CORAJE",
+        title: "El Vértigo no es Debilidad",
         subtitle: "Para los días difíciles",
         accent: "rgba(250, 218, 221, 0.22)",
-        quote: "El miedo no te hace débil. En Osadía, el miedo es la prueba de que eres valiente. Y tú eres la persona más valiente que conozco."
+        quote: "Ser valiente nunca significó dejar de sentir miedo antes de saltar, sino dar el paso incluso cuando te tiemblan las manos. Y tú llevas mucho tiempo saltando."
       },
       {
         id: "card-6",
         roman: "VI",
-        faction: "ABNEGACIÓN // PRIORIDAD",
-        title: "Hoy Te Toca Elegirte",
-        subtitle: "Cuida tu propio corazón",
+        faction: "CAPÍTULO VI // CALMA",
+        title: "Contra los Ladrones de Calma",
+        subtitle: "Tu tiempo es tuyo",
         accent: "rgba(226, 169, 178, 0.22)",
-        quote: "No tienes que ser Abnegación todo el tiempo, ayudando a todos y olvidándote de ti. Hoy te toca elegirte a ti."
+        quote: "No dejes que las voces grises de afuera te convenzan de que tu valor se mide por cuántas horas te agotas. Tu tiempo es tuyo, y descansar también es avanzar."
       },
       {
         id: "card-7",
         roman: "VII",
-        faction: "ERUDICIÓN // UNIVERSIDAD",
+        faction: "CAPÍTULO VII // AUTONOMÍA",
         title: "Mente Indomable",
         subtitle: "Cuando otros duden de ti",
         accent: "rgba(250, 218, 221, 0.26)",
-        quote: "Ser Divergente significa que tu mente no se deja controlar por nadie. Ni por el miedo, ni por lo que pasó, ni por lo que dicen los demás."
+        quote: "Que nadie te haga dudar de tu inteligencia ni de lo que eres capaz de construir. Tu mente no se deja programar por el miedo ni por lo que otros opinen desde lejos."
       },
       {
         id: "card-8",
         roman: "VIII",
-        faction: "PAISAJE DE LUZ // CALMA",
-        title: "Más que Perfecta",
-        subtitle: "Permiso para descansar",
+        faction: "CAPÍTULO VIII // PRIORIDAD",
+        title: "Permiso para Elegirte",
+        subtitle: "Cuida tu corazón",
         accent: "rgba(201, 138, 149, 0.22)",
-        quote: "Cuatro le dijo a Tris: 'No tienes que ser perfecta'. Y hoy te lo recuerdo yo: se vale cansarse, se vale dudar, y no tienes que poder con todo ni ser perfecta para brillar como lo haces."
+        quote: "No tienes que pasarte la vida cargando con los problemas de todos mientras te dejas al final de la fila. Hoy, y cada vez que lo necesites, también se vale elegirte a ti."
       },
       {
         id: "card-9",
         roman: "IX",
-        faction: "ERUDICIÓN // META",
-        title: "Cada Noche de Estudio",
-        subtitle: "Tu esfuerzo en la universidad",
+        faction: "CAPÍTULO IX // REFUGIO",
+        title: "La Casa de Ninguna Parte",
+        subtitle: "Una hora de silencio",
         accent: "rgba(250, 218, 221, 0.20)",
-        quote: "En la universidad habrá días pesados y personas que subestimen tu camino, pero ni siquiera en Erudición podrían medir todo lo que vas a lograr."
+        quote: "Ojalá nunca olvides cerrar la puerta al ruido del mundo cuando necesites respirar. Hay respuestas que solo aparecen cuando te regalas una hora de silencio real."
       },
       {
         id: "card-10",
         roman: "X",
-        faction: "VERDAD // CERTEZA",
-        title: "Contra Toda Duda",
-        subtitle: "Confía en lo que eres",
+        faction: "CAPÍTULO X // RESPIRO",
+        title: "Sin Necesidad de Perfección",
+        subtitle: "Brillas tal como eres",
         accent: "rgba(226, 169, 178, 0.24)",
-        quote: "Si algún día el ruido de los demás te hace dudar de tu capacidad, recuerda que las pruebas más duras solo se les presentan a quienes tienen la fuerza para superarlas."
+        quote: "Alguien muy sabio dijo alguna vez que no tienes que ser perfecta para ser extraordinaria. Se vale cansarse en medio del semestre, se vale dudar y aun así seguir brillando."
       },
       {
         id: "card-11",
         roman: "XI",
-        faction: "CORDIALIDAD // REFUGIO",
-        title: "Un Jardín en la Noche",
-        subtitle: "Hortensias en la oscuridad",
+        faction: "CAPÍTULO XI // VIRTUD",
+        title: "El Arte de Escuchar",
+        subtitle: "Un don poco común",
         accent: "rgba(250, 218, 221, 0.22)",
-        quote: "Incluso en medio del paisaje más oscuro, siempre encontrarás la forma de hacer florecer algo hermoso a tu alrededor."
+        quote: "En un mundo donde casi todos hablan para imponerse, tú conservas ese don rarísimo de escuchar de verdad y hacer que las personas se sientan comprendidas."
       },
       {
         id: "card-12",
         roman: "XII",
-        faction: "PINK + WHITE // BLONDE",
-        title: "Instantes que Permanecen",
-        subtitle: "Nostalgia luminosa",
+        faction: "CAPÍTULO XII // PINK + WHITE",
+        title: "Canción a Medianoche",
+        subtitle: "Luz que permanece",
         accent: "rgba(201, 138, 149, 0.24)",
-        quote: "Como en una canción de Frank Ocean a medianoche, hay personas y recuerdos que conservan su propia luz sin importar cuántos capítulos pasen."
+        quote: "Hay personas que, sin importar cuántas páginas pasen ni qué tan rápido gire todo, conservan una luz limpia y serena que no se apaga con los años."
       },
       {
         id: "card-13",
         roman: "XIII",
-        faction: "LEALTAD // DISTANCIA",
-        title: "Del Otro Lado",
-        subtitle: "Facciones distintas",
+        faction: "CAPÍTULO XIII // LEALTAD",
+        title: "Caminos Paralelos",
+        subtitle: "Siempre de tu lado",
         accent: "rgba(250, 218, 221, 0.20)",
-        quote: "No importa si ahora estamos en facciones diferentes. Yo sigo aquí, del otro lado de la pantalla, siempre de tu lado."
+        quote: "No importa si hoy nuestros días transcurren en capítulos o territorios distintos; yo sigo aquí, del otro lado, deseando que te salga bien todo lo que te propones."
       },
       {
         id: "card-14",
         roman: "XIV",
-        faction: "GODSPEED // APOYO",
-        title: "Sin Presión, Con Cariño",
-        subtitle: "Siempre cuentas conmigo",
+        faction: "CAPÍTULO XIV // GODSPEED",
+        title: "Tiempo Sin Prisa",
+        subtitle: "Cuentas conmigo",
         accent: "rgba(226, 169, 178, 0.25)",
-        quote: "No te escribo para que todo vuelva a ser como antes. Te escribo para que sepas que, pase el tiempo que pase, sigues contando conmigo."
+        quote: "No te escribo para pedirle al reloj que retroceda ni para que todo sea como antes. Te escribo simplemente para que sepas que, pase el tiempo que pase, sigues contando conmigo."
       },
       {
         id: "card-15",
         roman: "XV",
-        faction: "CAPÍTULO XXI // FUTURO",
-        title: "Imparable a los 21",
-        subtitle: "El inicio de tu mejor etapa",
+        faction: "CAPÍTULO XV // XXI",
+        title: "Imparable a los Veintiuno",
+        subtitle: "Dueña de tu tiempo",
         accent: "rgba(250, 218, 221, 0.28)",
-        quote: "Que estos 21 años te encuentren libre, orgullosa de todo lo que has resistido y lista para conquistar cada sueño que te propongas."
+        quote: "No cabes en una sola etiqueta, ni tu vida se mide en un reloj ajeno. Eres dueña de tu tiempo y de tu propio camino. Feliz cumpleaños, 21."
+      },
+      {
+        id: "card-16",
+        roman: "XVI",
+        faction: "SIN FILTROS // CERTEZA",
+        title: "Alguien Cree en Ti",
+        subtitle: "Para cualquier día de duda",
+        accent: "rgba(250, 218, 221, 0.26)",
+        quote: "Si algún día dudas de ti misma, recuerda que siempre alguien estará creyendo en ti."
+      },
+      {
+        id: "card-17",
+        roman: "XVII",
+        faction: "SIN FILTROS // ESFUERZO",
+        title: "Detrás de tu Valentía",
+        subtitle: "Lo que estás construyendo",
+        accent: "rgba(226, 169, 178, 0.28)",
+        quote: "Detrás de esa persona valiente, hay una niña que se está esforzando y tratando de cumplir con lo que se ha propuesto en su vida."
+      },
+      {
+        id: "card-18",
+        roman: "XVIII",
+        faction: "SIN FILTROS // ORIGEN",
+        title: "La Primera Vez",
+        subtitle: "Sin cambiar nada",
+        accent: "rgba(250, 218, 221, 0.30)",
+        quote: "Si nunca nos hubiéramos conocido y te viera hoy por primera vez, lo repetiría de nuevo."
       }
     ]
   },

@@ -314,7 +314,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
             {/* Pista Horizontal Deslizable con las Cartas en Espera */}
             <motion.div
               drag="x"
-              dragConstraints={{ left: -1100, right: 0 }}
+              dragConstraints={{ left: -Math.max(0, (queueCards.length - 2) * 205), right: 0 }}
               style={{
                 display: 'flex',
                 gap: '16px',
