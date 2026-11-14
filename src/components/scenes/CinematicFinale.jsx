@@ -6,6 +6,7 @@ import HydrangeaCluster from '../botanical/HydrangeaCluster';
 export default function CinematicFinale({ finaleData }) {
   return (
     <section
+      id="cinematic-finale-section"
       style={{
         position: 'relative',
         minHeight: '100vh',
@@ -16,7 +17,7 @@ export default function CinematicFinale({ finaleData }) {
         padding: '96px 20px',
         backgroundColor: '#0A0A0D',
         textAlign: 'center',
-        overflow: 'hidden',
+        overflowX: 'hidden',
         borderTop: '1px solid rgba(250, 218, 221, 0.12)',
       }}
     >

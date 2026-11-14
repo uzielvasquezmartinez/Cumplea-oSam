@@ -30,6 +30,7 @@ html, body {
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   scroll-behavior: smooth;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown } from 'lucide-react';
 import HydrangeaCluster from '../botanical/HydrangeaCluster';
 
 export default function DivergentGarden({ gardenData, onBack }) {
@@ -59,7 +59,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
         minHeight: '100vh',
         width: '100%',
         backgroundColor: '#07070A',
-        overflow: 'hidden',
+        overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -81,6 +81,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
             zIndex: 1,
             background: `radial-gradient(circle at 25% 40%, ${activeCard.accent} 0%, rgba(10, 10, 14, 0.94) 58%, #07070A 100%)`,
             overflow: 'hidden',
+            pointerEvents: 'none',
           }}
         >
           {/* Número Romano Monumental de Marca de Agua en el Fondo */}
@@ -192,11 +193,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
           }}
         >
           {/* PANEL IZQUIERDO: INFORMACIÓN COMPLETA Y FRASE DE LA CARTA ABIERTA */}
-          <div
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-            style={{ maxWidth: '640px' }}
-          >
+          <div style={{ maxWidth: '640px' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`info-${activeCard.id}`}
@@ -219,7 +216,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
                   }}
                 >
                   <span className="font-mono" style={{ fontSize: '11px', color: '#FADADD', fontWeight: 700 }}>
-                    CARTA {activeCard.roman} / XV
+                    CARTA {activeCard.roman} / {cards.length}
                   </span>
                   <span style={{ color: 'rgba(250,218,221,0.3)' }}>|</span>
                   <span className="font-mono" style={{ fontSize: '11px', color: '#FAFAFC', letterSpacing: '0.12em' }}>
@@ -320,6 +317,7 @@ export default function DivergentGarden({ gardenData, onBack }) {
                 gap: '16px',
                 cursor: 'grab',
                 paddingBottom: '12px',
+                touchAction: 'pan-y',
               }}
             >
               {queueCards.map((card, idx) => (
@@ -509,6 +507,32 @@ export default function DivergentGarden({ gardenData, onBack }) {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Botón sutil para continuar hacia el Cierre Cinemático */}
+        <div style={{ textAlign: 'center', marginTop: '16px', paddingBottom: '12px' }}>
+          <button
+            onClick={() => {
+              const finale = document.getElementById('cinematic-finale-section');
+              if (finale) finale.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="font-mono"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#A1A0AB',
+              fontSize: '11px',
+              letterSpacing: '0.12em',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+            }}
+          >
+            <span>VER MENSAJE FINAL</span>
+            <ChevronDown style={{ width: '13px', height: '13px', color: '#FADADD' }} />
+          </button>
         </div>
       </div>
     </section>

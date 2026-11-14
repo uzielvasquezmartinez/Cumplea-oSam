@@ -37,15 +37,17 @@ export default function SecretTrigger({ triggerData, onUnlock }) {
 
   return (
     <section
+      id="secret-trigger-section"
       style={{
         position: 'relative',
-        padding: '96px 20px',
+        padding: 'clamp(60px, 10vw, 96px) 20px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#0A0A0D',
         borderTop: '1px solid rgba(250, 218, 221, 0.12)',
+        overflowX: 'hidden',
       }}
     >
       <div style={{ maxWidth: '460px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 10 }}>

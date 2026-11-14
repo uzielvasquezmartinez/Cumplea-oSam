@@ -1,18 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 import HydrangeaCluster from '../botanical/HydrangeaCluster';
 
 export default function BrotherMessage({ content }) {
+  const handleScrollToTrigger = () => {
+    const trigger = document.getElementById('secret-trigger-section');
+    if (trigger) {
+      trigger.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section
+      id="brother-section"
       style={{
         position: 'relative',
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '80px 20px',
+        padding: 'clamp(60px, 10vw, 100px) 20px',
         backgroundColor: '#0A0A0D',
+        overflowX: 'hidden',
       }}
     >
       <div style={{ position: 'absolute', left: '-40px', top: '18%', opacity: 0.45, pointerEvents: 'none' }}>
@@ -55,6 +68,30 @@ export default function BrotherMessage({ content }) {
             </span>
           </div>
         </motion.div>
+
+        {/* Botón sutil para continuar al apartado secreto */}
+        <div style={{ textAlign: 'center', marginTop: '32px' }}>
+          <button
+            onClick={handleScrollToTrigger}
+            className="font-mono"
+            style={{
+              background: 'rgba(20, 20, 25, 0.7)',
+              border: '1px solid rgba(250, 218, 221, 0.25)',
+              borderRadius: '9999px',
+              padding: '8px 18px',
+              color: '#FADADD',
+              fontSize: '11px',
+              letterSpacing: '0.14em',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span>CONTINUAR</span>
+            <ChevronDown style={{ width: '14px', height: '14px' }} />
+          </button>
+        </div>
       </div>
     </section>
   );

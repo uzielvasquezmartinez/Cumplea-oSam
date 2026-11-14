@@ -158,16 +158,29 @@ function Constellation21({ morphed }) {
 
 export default function HeroScene({ profile }) {
   const [morphed, setMorphed] = useState(false);
+  const [isTouchDevice] = useState(() => {
+    return typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768);
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setMorphed(true), 1200);
     return () => clearTimeout(timer);
   }, []);
 
+  const handleScrollDown = () => {
+    const nextSection = document.getElementById('brother-section');
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section
       style={{
         position: 'relative',
+        minHeight: '100dvh',
         height: '100vh',
         width: '100%',
         backgroundColor: '#050507',
@@ -195,17 +208,29 @@ export default function HeroScene({ profile }) {
         <HydrangeaCluster baseDelay={0.2} size={165} />
       </div>
 
-      <div style={{ position: 'absolute', inset: 0, zIndex: 3, cursor: 'grab' }}>
+      {/* Canvas 3D: en pantallas táctiles se desactiva pointerEvents para permitir el scroll natural del celular */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 3,
+          cursor: isTouchDevice ? 'default' : 'grab',
+          pointerEvents: isTouchDevice ? 'none' : 'auto',
+          touchAction: 'pan-y',
+        }}
+      >
         <Canvas camera={{ position: [0, 0, 6.2], fov: 50 }} dpr={[1, 2]}>
           <ambientLight intensity={0.8} />
           <Constellation21 morphed={morphed} />
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 1.4}
-            rotateSpeed={0.5}
-          />
+          {!isTouchDevice && (
+            <OrbitControls
+              enablePan={false}
+              enableZoom={false}
+              minPolarAngle={Math.PI / 3}
+              maxPolarAngle={Math.PI / 1.4}
+              rotateSpeed={0.5}
+            />
+          )}
         </Canvas>
       </div>
 
@@ -285,31 +310,64 @@ export default function HeroScene({ profile }) {
           </span>
         </motion.h1>
 
-        <motion.p
+        <motion.button
+          onClick={handleScrollDown}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.1 }}
           className="font-mono"
-          style={{ fontSize: '11px', color: '#A1A0AB', marginTop: '16px', letterSpacing: '0.12em' }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            fontSize: '11px',
+            color: '#A1A0AB',
+            marginTop: '16px',
+            letterSpacing: '0.12em',
+            cursor: 'pointer',
+            padding: 0,
+            pointerEvents: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
         >
-          DESLIZA PARA QUE SIGAS EXPLORANDO
-        </motion.p>
+          DESLIZA PARA SEGUIR EXPLORANDO
+        </motion.button>
       </div>
 
-      <motion.div
+      {/* Botón táctil explícito para deslizar/bajar */}
+      <motion.button
+        onClick={handleScrollDown}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.94 }}
         animate={{ y: [0, 6, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        aria-label="Deslizar hacia abajo"
         style={{
           position: 'absolute',
           bottom: '22px',
           left: '50%',
           transform: 'translateX(-50%)',
-          zIndex: 10,
+          zIndex: 20,
+          pointerEvents: 'auto',
+          backgroundColor: 'rgba(20, 20, 25, 0.85)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(250, 218, 221, 0.3)',
+          borderRadius: '9999px',
+          padding: '8px 18px',
           color: '#FADADD',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          cursor: 'pointer',
+          boxShadow: '0 0 16px rgba(250, 218, 221, 0.2)',
         }}
       >
-        <ChevronDown style={{ width: '20px', height: '20px' }} />
-      </motion.div>
+        <span className="font-mono" style={{ fontSize: '10px', letterSpacing: '0.14em' }}>
+          DESLIZAR
+        </span>
+        <ChevronDown style={{ width: '15px', height: '15px' }} />
+      </motion.button>
     </section>
   );
 }
